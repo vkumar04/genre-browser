@@ -355,8 +355,10 @@ export default function App() {
             }}
             side="bottom"
             showCloseButton={false}
-            className={`${catMeta(sheetGenre.cat).theme} max-h-[88dvh] gap-0 overflow-y-auto rounded-t-3xl border-t-4 border-t-[var(--cat)] sm:mx-auto sm:max-w-xl`}
+            className={`${catMeta(sheetGenre.cat).theme} max-h-[88dvh] gap-0 overflow-hidden rounded-t-3xl border-t-4 border-t-[var(--cat)] sm:mx-auto sm:max-w-xl`}
           >
+            {/* Pinned top: handle, close, and genre header stay put while the body scrolls */}
+            <div className="relative flex-none bg-linear-to-br from-[var(--cat-soft)] to-background">
             <div aria-hidden="true" className="mx-auto mt-2.5 h-1.5 w-10 rounded-full bg-muted-foreground/30" />
             <SheetClose asChild>
               <Button variant="outline" size="icon-sm" className="absolute top-4 right-4 rounded-full">
@@ -364,7 +366,7 @@ export default function App() {
                 <span className="sr-only">Close details for {sheetGenre.name}</span>
               </Button>
             </SheetClose>
-            <SheetHeader className="relative overflow-hidden border-b bg-linear-to-br from-[var(--cat-soft)] to-background px-5 pt-3 pb-4 pr-14">
+            <SheetHeader className="relative overflow-hidden border-b px-5 pt-3 pb-4 pr-14">
               <span aria-hidden="true" className="pointer-events-none absolute right-4 -bottom-5 rotate-12 text-7xl opacity-15">
                 {catMeta(sheetGenre.cat).emoji}
               </span>
@@ -377,7 +379,8 @@ export default function App() {
                 <ModeBadges genre={sheetGenre} />
               </motion.div>
             </SheetHeader>
-            <div className="px-5 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
               <GenreDetailBody genre={sheetGenre} />
             </div>
           </SheetContent>

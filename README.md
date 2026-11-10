@@ -27,3 +27,11 @@ Gemini has no URL prefill, so its button copies the prompt to the clipboard and 
 - Skip link, `/` jumps to search, visible focus rings, a light and dark theme with text contrast ≥ 4.5:1, Windows High Contrast support
 - All Motion animation respects `prefers-reduced-motion`
 - Scanned with axe-core (WCAG 2.2 AA): 0 violations on desktop (light and dark), phone, and tablet
+
+## SEO
+`seo/vite-plugin-seo.ts` adds at build time: title/description, Open Graph + Twitter cards (`public/og-image.jpg`),
+canonical URL, JSON-LD (WebSite + LearningResource listing all 60 genres), a `<noscript>` genre list for crawlers,
+`robots.txt`, and `sitemap.xml`. Icons and `site.webmanifest` live in `public/`.
+
+The absolute site URL comes from `SITE_URL`, falling back to Railway's `RAILWAY_PUBLIC_DOMAIN`.
+To pin it (recommended, or for a custom domain): `railway variables --set SITE_URL=https://your-domain`

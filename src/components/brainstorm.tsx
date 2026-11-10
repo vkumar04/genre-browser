@@ -68,7 +68,7 @@ export function Brainstorm({ genre }: { genre: Genre }) {
   };
 
   return (
-    <section aria-labelledby={headingId} className="mt-6 border-t pt-5">
+    <section aria-labelledby={headingId} className="mt-5 border-t pt-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 id={headingId} className="flex items-center gap-2 text-sm font-semibold">
           <Sparkles aria-hidden="true" className="size-4 text-[var(--cat)]" />
