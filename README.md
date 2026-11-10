@@ -10,7 +10,10 @@ npm install
 npm run dev
 ```
 
-## Deploy (Railway)
+## Deploy
+From your Mac: `./deploy.sh` — creates the public GitHub repo, pushes, and deploys with the Railway CLI.
+
+### Railway
 `railway.json` builds with `npm run build` and serves `dist/` with `npm start` on `$PORT`.
 
 ## Brainstorm with AI
