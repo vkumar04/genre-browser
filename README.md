@@ -14,7 +14,7 @@ npm run dev
 From your Mac: `./deploy.sh` — creates the public GitHub repo, pushes, and deploys with the Railway CLI.
 
 ### Railway
-`railway.json` builds with `npm run build` and serves `dist/` with `npm start` on `$PORT`.
+`.railway/railway.ts` (Infrastructure as Code) builds with `npm run build`, serves `dist/` with `npm start` on `$PORT`, and sets `SITE_URL` from the service's public domain.
 
 ## Brainstorm with AI
 Each genre offers three kinds of prompt (Ideas, Outline, Examples) and opens Claude or ChatGPT with the prompt prefilled.
@@ -33,5 +33,5 @@ Gemini has no URL prefill, so its button copies the prompt to the clipboard and 
 canonical URL, JSON-LD (WebSite + LearningResource listing all 60 genres), a `<noscript>` genre list for crawlers,
 `robots.txt`, and `sitemap.xml`. Icons and `site.webmanifest` live in `public/`.
 
-The absolute site URL comes from `SITE_URL`, falling back to Railway's `RAILWAY_PUBLIC_DOMAIN`.
-To pin it (recommended, or for a custom domain): `railway variables --set SITE_URL=https://your-domain`
+The absolute site URL comes from `SITE_URL` (declared in `.railway/railway.ts`), falling back to `RAILWAY_PUBLIC_DOMAIN`.
+For a custom domain, change `SITE_URL` there, then `railway config apply`.
