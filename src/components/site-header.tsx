@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
+import { semesterFor } from "@/lib/semester";
 import { AudioLines, Image, PenLine, Quote, Sparkles, BookOpen } from "lucide-react";
 
 const GLYPHS = [PenLine, Image, AudioLines, Quote, Sparkles, BookOpen];
@@ -45,6 +46,7 @@ function Backdrop() {
 }
 
 export function SiteHeader({ count }: { count: number }) {
+  const semester = semesterFor().label;
   return (
     <header className="relative overflow-hidden bg-hero bg-linear-to-br from-[#312e81] via-[#5b21b6] to-[#9d174d] text-white dark:from-[#1e1b4b] dark:via-[#3b0764] dark:to-[#500724]">
       <Backdrop />
@@ -55,7 +57,7 @@ export function SiteHeader({ count }: { count: number }) {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         <p className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-[0.1em] uppercase ring-1 ring-white/25 backdrop-blur">
-          <span aria-hidden="true">✦</span> WRDS 1103 · Lawson · Fall 2026
+          <span aria-hidden="true">✦</span> WRDS 1103 · Lawson · {semester}
         </p>
         <h1 className="mb-2 font-serif text-[clamp(2.1rem,6vw,3.25rem)] leading-[1.05] font-normal">
           Genre <span className="text-gradient-pop">Browser</span>

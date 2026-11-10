@@ -1,37 +1,34 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight, Check, Copy, Lightbulb, ListTree, BookOpenText, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, BookOpenText, Check, Copy, Lightbulb, ListTree, Sparkles, type LucideIcon } from "lucide-react";
 import type { Genre } from "@/data/genres";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn } from "@/lib/utils";
 
 type PromptKind = "ideas" | "outline" | "examples";
 
-/** "a Podcast episode" / "an Infographic" */
-const aOrAn = (name: string) => (/^[aeiou]/i.test(name) ? `an ${name}` : `a ${name}`);
 
 const PROMPTS: Record<PromptKind, { label: string; icon: LucideIcon; build: (g: Genre) => string }> = {
   ideas: {
     label: "Ideas",
     icon: Lightbulb,
     build: (g) =>
-      `Help me brainstorm ${aOrAn(g.name)} for my WRDS 1103 genre project. My research topic is: [your topic]. ` +
+      `I'm working in the "${g.name}" genre for my WRDS 1103 genre project. My research topic is: [your topic]. ` +
       `Give me 5 creative angles, who the audience would be, and the rhetorical moves this genre uses.`,
   },
   outline: {
     label: "Outline",
     icon: ListTree,
     build: (g) =>
-      `Help me outline ${aOrAn(g.name)} for my WRDS 1103 genre project on [your topic]. ` +
+      `Help me outline a piece in the "${g.name}" genre for my WRDS 1103 genre project on [your topic]. ` +
       `Cover the genre's typical conventions and structure, and show how to adapt my research into it.`,
   },
   examples: {
     label: "Examples",
     icon: BookOpenText,
     build: (g) =>
-      `What makes a strong ${g.name.toLowerCase()}? Describe 3 typical or well-known examples, the conventions they share, ` +
-      `and how I could use them as models for my WRDS 1103 genre project.`,
+      `What makes a strong piece in the "${g.name}" genre? Describe 3 typical or well-known examples, ` +
+      `the conventions they share, and how I could use them as models for my WRDS 1103 genre project.`,
   },
 };
 
@@ -54,23 +51,43 @@ async function copyText(text: string) {
 export function Brainstorm({ genre }: { genre: Genre }) {
   const [kind, setKind] = useState<PromptKind>("ideas");
   const [notice, setNotice] = useState("");
+  const [copied, setCopied] = useState<string | null>(null);
   const prompt = PROMPTS[kind].build(genre);
+  const headingId = `brainstorm-${genre.name.replace(/\W+/g, "-")}`;
 
   useEffect(() => {
-    if (!notice) return;
-    const t = setTimeout(() => setNotice(""), 4000);
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(null), 3500);
     return () => clearTimeout(t);
-  }, [notice]);
+  }, [copied]);
+
+  const copy = async (target: string, label: string) => {
+    const ok = await copyText(prompt);
+    setCopied(ok ? target : null);
+    setNotice(ok ? label : "Couldn't copy. Select the prompt text instead.");
+  };
 
   return (
-    <section aria-labelledby={`brainstorm-${genre.name}`} className="mt-5 rounded-xl border border-[color-mix(in_srgb,var(--cat)_35%,transparent)] bg-[var(--cat-soft)]/60 p-3.5">
-      <h3 id={`brainstorm-${genre.name}`} className="mb-2.5 text-sm font-bold">
-        <span aria-hidden="true">🧠 </span>Brainstorm with AI
-      </h3>
+    <section aria-labelledby={headingId} className="mt-6 border-t pt-5">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 id={headingId} className="flex items-center gap-2 text-sm font-semibold">
+          <Sparkles aria-hidden="true" className="size-4 text-[var(--cat)]" />
+          Brainstorm with AI
+        </h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-mr-2 h-8 text-muted-foreground hover:text-foreground"
+          onClick={() => copy("prompt", "Prompt copied.")}
+        >
+          {copied === "prompt" ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+          {copied === "prompt" ? "Copied" : "Copy prompt"}
+        </Button>
+      </div>
 
       <ToggleGroup
         type="single"
-        spacing={1}
+        variant="outline"
         value={kind}
         onValueChange={(v) => v && setKind(v as PromptKind)}
         aria-label="What should the AI help with?"
@@ -82,7 +99,7 @@ export function Brainstorm({ genre }: { genre: Genre }) {
             <ToggleGroupItem
               key={k}
               value={k}
-              className="h-8 flex-1 rounded-full border border-[color-mix(in_srgb,var(--cat)_45%,transparent)] bg-card text-xs text-[var(--cat-ink)] hover:bg-card hover:text-[var(--cat-ink)] data-[state=on]:border-[var(--cat-ink)] data-[state=on]:bg-[var(--cat-ink)] data-[state=on]:text-[var(--cat-on)]"
+              className="h-9 flex-1 text-xs data-[state=on]:bg-[var(--cat-soft)] data-[state=on]:text-[var(--cat-ink)] data-[state=on]:font-semibold"
             >
               <Icon aria-hidden="true" className="size-3.5" />
               {label}
@@ -94,66 +111,57 @@ export function Brainstorm({ genre }: { genre: Genre }) {
       <AnimatePresence mode="wait" initial={false}>
         <motion.p
           key={kind}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.15 }}
-          className="mb-3 rounded-lg bg-card px-3 py-2 text-[13px] leading-relaxed text-secondary-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.12 }}
+          className="mb-3 rounded-lg bg-muted/60 px-3 py-2.5 text-[13px] leading-relaxed text-muted-foreground"
         >
-          <span className="sr-only">Prompt: </span>“{prompt}”
+          <span className="sr-only">Prompt: </span>
+          {prompt}
         </motion.p>
       </AnimatePresence>
 
-      <div className="grid grid-cols-3 gap-2">
-        {ASSISTANTS.map((a, i) => (
-          <motion.div key={a.id} whileHover={{ y: -2, scale: 1.03 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              asChild
-              className={cn(
-                "h-10 w-full rounded-xl px-2 font-semibold",
-                i === 0
-                  ? "bg-[var(--cat-ink)] text-[var(--cat-on)] shadow-[0_8px_18px_-8px_var(--cat)] hover:bg-[var(--cat-ink)] hover:brightness-110"
-                  : "border border-[var(--cat-ink)] bg-card text-[var(--cat-ink)] hover:bg-card hover:brightness-95",
-              )}
-            >
-              <a
+      <ul className="flex flex-col gap-2">
+        {ASSISTANTS.map((a) => {
+          const justCopied = copied === a.id;
+          return (
+            <li key={a.id}>
+              <motion.a
                 href={a.href(prompt)}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={async () => {
-                  if (!a.copies) return;
-                  const ok = await copyText(prompt);
-                  setNotice(ok ? `Prompt copied. Paste it into ${a.name}.` : `Copy the prompt above and paste it into ${a.name}.`);
+                onClick={() => {
+                  if (a.copies) void copy(a.id, `Prompt copied. Paste it into ${a.name}.`);
                 }}
+                whileHover={{ x: 3 }}
+                whileTap={{ scale: 0.98 }}
+                className="group flex items-center gap-3 rounded-xl border bg-card px-4 py-2.5 transition-colors outline-none hover:border-[var(--cat)] hover:bg-[var(--cat-soft)] focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >
-                {a.name}
-                <ArrowUpRight aria-hidden="true" />
-                <span className="sr-only">
-                  {a.copies ? " (copies the prompt, then opens in a new tab)" : " (opens in a new tab with this prompt)"}
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold">{a.name}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {justCopied ? "Copied! Paste it in when it opens" : a.copies ? "Copies the prompt, then opens" : "Prompt filled in for you"}
+                  </span>
                 </span>
-              </a>
-            </Button>
-          </motion.div>
-        ))}
-      </div>
+                {justCopied ? (
+                  <Check aria-hidden="true" className="size-4 text-[var(--cat-ink)]" />
+                ) : (
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--cat-ink)]"
+                  />
+                )}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </motion.a>
+            </li>
+          );
+        })}
+      </ul>
 
-      <div className="mt-2.5 flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground" role="status" aria-live="polite">
-          {notice || "Opens in a new tab. Gemini: the prompt is copied for you to paste."}
-        </p>
-        <Button
-          variant="ghost"
-          size="xs"
-          className="shrink-0 text-[var(--cat-ink)] hover:bg-card hover:text-[var(--cat-ink)]"
-          onClick={async () => {
-            const ok = await copyText(prompt);
-            setNotice(ok ? "Prompt copied." : "Couldn't copy. Select the prompt text instead.");
-          }}
-        >
-          {notice.startsWith("Prompt copied") ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
-          Copy prompt
-        </Button>
-      </div>
+      <p className="sr-only" role="status" aria-live="polite">
+        {notice}
+      </p>
     </section>
   );
 }
